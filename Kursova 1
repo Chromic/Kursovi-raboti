@@ -6,14 +6,30 @@
 #include <math.h>
 #include <conio.h>
 #include <string.h>
-//ONUR
 
+/*Create a Multidimentional array. Create a new One dimentional array where the elements are taken from the ROWS of the first array. Exponent those elements by 3 and multiply them then add them to the 1D array.
+
+Example:
+Rows = 3
+Cows = 3
+
+Elemenets are:
+2 2 2
+2 2 2
+2 2 2
+
+Output:
+
+B[0] = 512
+B[1] = 512
+B[2] = 512
+*/
 void main()
 {
 	system("chcp 1251");
 	int i, j, k, br, rows, cols;
 	int A[100][100];
-	int a[100];
+	int B[100];
 	printf(" Въведете брой редове (<=100) \n");
 	scanf("%d", &rows);
 	printf(" Въведете брой стълбове(<=100) \n");
@@ -32,8 +48,8 @@ void main()
 				br = pow(br, 3);
 				k = br;
 		}
-		a[i] = k;
-		printf("a[%d]=%d \n", i, a[i]);
+		B[i] = k;
+		printf("B[%d]=%d \n", i, B[i]);
 	}
 	getch();
 }
