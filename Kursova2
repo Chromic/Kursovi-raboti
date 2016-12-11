@@ -120,7 +120,7 @@ void writeTextFile() {
 }
 
 void deleteData() {
-	FILE *temp = fopen("temp", "rb");
+	FILE *temp = fopen("temp", "wb");
 	int k;
 	printf("Въведи код:");
 	scanf("%d", &k);
