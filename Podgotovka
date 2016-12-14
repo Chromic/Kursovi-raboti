@@ -1,0 +1,169 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Product {
+	int kod;
+	char ime[20], mqrka[20];
+	float cena, kol;
+};
+
+char fime[30];
+FILE *fp;
+Product pr;
+
+void createfile() {
+	fp = fopen(fime, "wb");
+	fclose(fp);
+	printf("Файлът е създаден!\n");
+}
+
+void readProduct(Product *p) {
+	printf("Данни за нов продукт:\n");
+	printf("Код: "); scanf("%d", &p->kod); getchar();
+	printf("Име: "); gets_s(p->ime);
+	printf("Мярка: "); gets_s(p->mqrka);
+	printf("Единична цена: "); scanf("%f", &p->cena);
+	printf("Количество: "); scanf("%f", &p->kol);
+	getchar();
+
+}
+
+void addData() {
+	fp = fopen(fime, "a+b");
+	char c;
+	do {
+		readProduct(&pr);
+		fwrite(&pr, sizeof(pr), 1, fp);
+		printf("Още продукти? (y/n) : ");
+		c = getchar(); getchar();
+	} while (c == 'y');
+	fclose(fp);
+}
+
+void writeProducts() {
+	fp = fopen(fime, "rb");
+	printf("Продукти във файла:\n");
+	fread(&pr, sizeof(pr), 1, fp);
+	while (!feof(fp)) {
+		printf("%d %s с количество:%f\n", pr.kod, pr.ime, pr.kol);
+		fread(&pr, sizeof(pr), 1, fp);
+	}
+	fclose(fp);
+}
+
+void changeProduct() {
+	fp = fopen(fime, "r+b");
+	int k;
+	printf("Задай код на продукт: ");
+	scanf("%d", &k);
+	fread(&pr, sizeof(pr), 1, fp);
+	while (!feof(fp)) {
+		if (pr.kod == k) {
+			float dk;
+			printf("Въведи допълнително количество: ");
+			scanf("%f", &dk);
+			pr.kol += dk;
+			fseek(fp, -(long) sizeof(pr), SEEK_CUR);
+			fwrite(&pr, sizeof(pr), 1, fp);
+			printf("Добавено е количество към продукт: %s \n", pr.ime);
+			break;
+		}
+		fread(&pr, sizeof(pr), 1, fp);
+	}
+	fclose(fp);
+}
+
+void calculateMoney() {
+	fp = fopen(fime, "rb");
+	float suma = 0.0;
+	fread(&pr, sizeof(pr), 1, fp);
+	while (!feof(fp)) {
+		suma += pr.kol*pr.cena;
+		fread(&pr, sizeof(pr), 1, fp);
+	}
+	fclose(fp);
+	printf("Налична стока в пари: %.2f\n", suma);
+}
+
+void writeData() {
+	char imqrka[20];
+	fp = fopen(fime, "rb");
+	fread(&pr, sizeof(pr), 1, fp);
+	getchar();
+	printf("Въведи зададена мярка:");
+	gets_s(imqrka);
+	while (!feof(fp)) {
+		if (strcmp(imqrka, pr.mqrka) == 0 && pr.kol>0) {
+			printf("%d %s с количество:%f\n", pr.kod, pr.ime, pr.kol);
+		}
+		fread(&pr, sizeof(pr), 1, fp);
+	}
+	fclose(fp);
+}
+
+void writeTextFile() {
+	FILE *txt;
+	txt = fopen("products.txt", "wt");
+	fp = fopen(fime, "rb");
+	fread(&pr, sizeof(pr), 1, fp);
+	while (!feof(fp)) {
+		fprintf(txt, "%d %s с количество:.2%f и цена:%.2f\n", pr.kod, pr.ime, pr.kol, pr.cena);
+		fread(&pr, sizeof(pr), 1, fp);
+	}
+	fclose(fp);
+	fclose(txt);
+	printf("Продуктите се записаха в текстовия файл.\n");
+}
+
+void deleteData() {
+	FILE *temp = fopen("temp", "wb");
+	int k;
+	printf("Въведи код:");
+	scanf("%d", &k);
+	fp = fopen(fime, "rb");
+	fread(&pr, sizeof(pr), 1, fp);
+	while (!feof(fp)) {
+		if (pr.kod != k)
+			fwrite(&pr, sizeof(pr), 1, temp);
+		else
+			printf("продукът е изтрит: \n");
+		fread(&pr, sizeof(pr), 1, fp);
+	}
+	fclose(fp);
+	fclose(temp);
+	remove(fime);
+	rename("temp", fime);
+}
+void main() {
+	system("chcp 1251");
+	printf("Име на файл: ");
+	gets_s(fime);
+	int otg;
+	do {
+		printf("\nМеню\n");
+		printf("0 - Изход\n");
+		printf("1 - Създаване на празен файл.\n");
+		printf("2 - Добавяне към файла.\n");
+		printf("3 - Промяна на количество по зададен код.\n");
+		printf("4 - Изчисляване на налична стока в парично изражение.\n");
+		printf("5 - Извеждане всички продукти със зададена мярка и количество > 0.\n");
+		printf("6 - Извеждане всички продукти от файла.\n");
+		printf("7 - Извеждане всички продукти в текстов файл.\n");
+		printf("8 - Изтриване на продукт от файла по зададен код.\n");
+		printf("Избери: ");
+		scanf("%d", &otg);
+		switch (otg) {
+		case 1: createfile(); break;
+		case 2: addData(); break;
+		case 3: changeProduct(); break;
+		case 4: calculateMoney(); break;
+		case 5: writeData(); break;
+		case 6: writeProducts(); break;
+		case 7: writeTextFile(); break;
+		case 8: deleteData(); break;
+		}
+	} while (otg != 0);
+}
