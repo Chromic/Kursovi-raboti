@@ -4,16 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Student 
+struct Student
 {
 	char ime[50];
-	int fn, nm;
-	int ocfiz[10], ocmat[10], ocpro[10];
+	int fn;
+	int ocfiz, ocmat, ocpro;
 };
+
 char filename[20];
-
 FILE *fd;
-
 Student ps;
 
 void createFile()
@@ -23,94 +22,99 @@ void createFile()
 	printf("File created!\n");
 }
 
-void readStud(Student *s) 
+void readStud(Student *s)
 {
 	printf("Enter data for new student");
 	getchar();
-	
-	printf("\nEnter student name:"); 
+	printf("\nEnter student name:");
 	gets_s(s->ime);
-	
 	printf("\nEnter FN:");
 	scanf_s("%d", &s->fn);
-	
+	printf("Enter ");
 	printf("\nEnter marks for Maths, Programming, Physics");
-	printf("\n Number of Maths marks: ");
-	int n;
-	scanf_s("%d", &s->nm);
-	for (int i = 0; i < ps.nm; i++) {
-		printf("\n # %d ",i+1);
-		scanf_s("%d", &s->ocmat);
-	}
-	printf("\nNumber of programming marks: ");
-	scanf_s("%d", &s->nm);
-	for (int i = 0; i < ps.nm; i++) {
-		printf("\n # %d", i+1);
-		scanf_s("%d", &s->ocpro);
-	}
-
-	printf("\nPhysics");
+	printf("\nMaths ");
+	scanf("%d", &s->ocmat);
+	printf("\nProgramming ");
+	scanf("%d", &s->ocpro);
+	printf("\nPhysics ");
 	scanf_s("%d", &s->ocfiz);
-	getchar(); 
+	getchar();
 }
-void addStud() 
+void addStud()
 {
 	fd = fopen(filename, "a+b");
 	char c;
-	do 
+	do
 	{
 		readStud(&ps);
 		fwrite(&ps, sizeof(ps), 1, fd);
 		printf("More Students? (y/n) : ");
 		c = getchar(); getchar();
-	} 
-	while (c == 'y');
+	} while (c == 'y');
 	fclose(fd);
 }
 
-void writeAllStud() 
+void writeAllStud()
 {
-		fd = fopen(filename, "rb");
-		printf("students in file\n");
+	fd = fopen(filename, "rb");
+	printf("students in file\n");
+	fread(&ps, sizeof(ps), 1, fd);
+	while (!feof(fd))
+	{
+		printf("%s fn: %d ocmat: %d ocpro: %d ocfiz: %d", ps.ime, ps.fn, ps.ocmat, ps.ocpro, ps.ocfiz);
 		fread(&ps, sizeof(ps), 1, fd);
-		while (!feof(fd)) 
-		{
-			printf("%s fn: %d ocmat: %d ocpro: %d ocfiz: %d", ps.ime, ps.fn, ps.ocmat, ps.ocpro, ps.ocfiz);
-			fread(&ps, sizeof(ps), 1, fd);
-		}
+	}
 	fclose(fd);
 }
-/*
-void changeStud() 
+void changeStud()
 {
 	int fn2;
 	printf("enter FN:");
-	scanf_s("%d", &fn2);
+	scanf_s("%d", &fn2); getchar();
 	fd = fopen(filename, "r+b");
 	fread(&ps, sizeof(ps), 1, fd);
 	while (!feof(fd)) {
 		if (ps.fn == fn2)
 		{
-
+			char name2[20];
+			printf("Enter new name for student: ");
+			gets_s(name2);
+			strcpy(ps.ime, name2);
 			fseek(fd, -(long) sizeof(ps), SEEK_CUR);
-			fwrite(&ps, sizeof(ps, 1, fd));
+			fwrite(&ps, sizeof(ps), 1, fd);
 			break;
 		}
+		fread(&ps, sizeof(ps), 1, fd);
 	}
-}*/
-
-void Avg() 
-{
-
+	fclose(fd);
 }
 
-void exportData() 
+void Avg()
+{
+	float avgmat = 0.0, avgfiz = 0.0, avgpro = 0.0;
+	float suma1 = 0.0, suma2 = 0.0, suma3 = 0.0;
+	int i = 0;
+	fd = fopen(filename, "rb");
+	fread(&ps, sizeof(ps), 1, fd);
+	while (!feof(fd)) {
+		i++;
+		avgmat += ps.ocmat;
+		avgfiz += ps.ocfiz;
+		avgpro += ps.ocpro;
+		fread(&ps, sizeof(ps), 1, fd);
+	}
+	if (i > 0)
+		printf("Avg maths = %f \n Avg physics = %f \n Avg programming =  %f \n", avgmat / i, avgfiz / i, avgpro / i);
+	fclose(fd);
+}
+
+void exportData()
 {
 	FILE *txt;
 	txt = fopen("students.txt", "wt");
 	fd = fopen(filename, "rb");
 	fread(&ps, sizeof(ps), 1, fd);
-	while (!feof(fd)) 
+	while (!feof(fd))
 	{
 		fprintf(txt, "%d %s marks are - fiz %d mat %d prog %d \n", ps.fn, ps.ime, ps.ocfiz, ps.ocmat, ps.ocpro);
 		fread(&ps, sizeof(ps), 1, fd);
@@ -119,12 +123,12 @@ void exportData()
 	fclose(txt);
 	printf("students have been written to a text file.\n");
 }
-void main() 
+void main()
 {
 	printf("Enter file name:");
 	gets_s(filename);
 	int c;
-	do 
+	do
 	{
 		printf("\nMenu:\n");
 		printf("0 Exit\n");
@@ -133,17 +137,16 @@ void main()
 		printf("3 Change data from FN\n");
 		printf("4 AVG marks for maths, programming, physics\n");
 		printf("5 export all AVG marks to .txt file\n");
-		printf("6 display data of all students");
+		printf("6 display data of all students\n");
 		scanf("%d", &c);
-		switch (c) 
+		switch (c)
 		{
 		case 1: createFile(); break;
 		case 2: addStud(); break;
-		//case 3: changeStud; break;
+		case 3: changeStud(); break;
 		case 4: Avg(); break;
 		case 5: exportData(); break;
 		case 6: writeAllStud(); break;
 		}
-	} 
-	while (c != 0);
+	} while (c != 0);
 }
