@@ -1,0 +1,173 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct STUDENTS
+{
+	char ime[50], fn[7];
+	int egn, ocenki[5];
+};
+
+char filename[20];
+FILE *studfile;
+STUDENTS stud1;
+
+void deleteData() {
+	FILE *delData; //Помощен файл, за изтриването
+	char FN[7]; //ЕГН за изтриване
+	printf("Въведете ФН: "); 
+	gets_s(FN);
+	studfile = fopen(filename, "rb"); delData = fopen("Del", "wb");
+	fread(&stud1, sizeof(stud1), 1, studfile);
+	while (!feof(studfile)) {
+		if (strcmp(stud1.fn, FN) != 0)
+			fwrite(&stud1, sizeof(stud1), 1, delData);
+		else printf("Данни ФН %d изтрити.\n", FN);
+		fread(&stud1, sizeof(stud1), 1, studfile);
+	}
+	fclose(studfile); 
+	fclose(delData);
+	remove(filename); 
+	rename("Del", filename);
+}
+void createFile()
+{
+	studfile = fopen(filename, "wb");
+	fclose(studfile);
+	printf("Файлът е създаден!\n");
+}
+
+void readStud(STUDENTS *s)
+{
+	printf("Въведете данни за студента");
+	getchar();
+	printf("\nИме на студента:");
+	gets_s(s->ime);
+	printf("\nФакултетен номер:");
+	gets_s(s->fn);
+	printf("\nВъведи ЕГН:");
+	scanf_s("%d", &s->egn);
+	printf("\nОценки по Математика, програмиране, физика, английски, електротехника\n");
+	for (int i = 0; i < 5; i++) {
+		scanf("%d", &s->ocenki[i]);
+	}
+	getchar();
+}
+
+/*
+void changeInfo()
+{
+	int egn2;
+	printf("Въведи ЕГН:");
+	scanf_s("%d", &egn2); getchar();
+	studfile = fopen(filename, "r+b");
+	fread(&stud1, sizeof(stud1), 1, studfile);
+	while (!feof(studfile)) {
+		if (stud1.fn == egn2)
+		{
+			char name2[20];
+			printf("Въведете ново име за студента: ");
+			gets_s(name2);
+			strcpy(stud1.ime, name2);
+			fseek(studfile, -(long) sizeof(stud1), SEEK_CUR);
+			fwrite(&stud1, sizeof(stud1), 1, studfile);
+			break;
+		}
+		fread(&stud1, sizeof(stud1), 1, studfile);
+	}
+	fclose(studfile);
+}*/
+
+void exportData()
+{
+	FILE *txt;
+	txt = fopen("students.txt", "wt");
+	studfile = fopen(filename, "rb");
+	fread(&stud1, sizeof(stud1), 1, studfile);
+	while (!feof(studfile))
+	{
+		fprintf(txt, "%d %s Оценкте са - %d \n", stud1.fn, stud1.ime, stud1.ocenki);
+		fread(&stud1, sizeof(stud1), 1, studfile);
+	}
+	fclose(studfile);
+	fclose(txt);
+	printf("students have been written to a text file.\n");
+}
+
+void addStudent()
+{
+	studfile = fopen(filename, "a+b");
+	char c;
+	do
+	{
+		readStud(&stud1);
+		fwrite(&stud1, sizeof(stud1), 1, studfile);
+		printf("Да се добавят ли още студенти? (y/n) : ");
+		c = getchar(); getchar();
+	} while (c == 'y');
+	fclose(studfile);
+}
+void writeAllStud()
+{
+	studfile = fopen(filename, "rb");
+	printf("Студенти в файла\n");
+	fread(&stud1, sizeof(stud1), 1, studfile);
+	while (!feof(studfile))
+	{
+		
+		printf("%s ФН: %d \n", stud1.ime, stud1.fn);
+		printf("С оценки съответно по математика, програмиране, физика, английски, електротехника \n");
+		for (int i = 0; i < 5; i++) {
+			printf("%d \n", stud1.ocenki[i]);
+		}
+		fread(&stud1, sizeof(stud1), 1, studfile);
+	}
+	fclose(studfile);
+}
+
+
+
+void writeAvgStud() {
+	float a = 0.0, br = 0.0;
+	float avg = 0.0;
+	studfile = fopen(filename, "rb");
+	printf("\nСтуденти със среден успех над 4:\n");
+	fread(&stud1, sizeof(stud1), 1, studfile);
+	for (int i = 0; i < 5; i++) {
+		a += stud1.ocenki[i];
+	}
+	avg = a / 5.0;
+	//while (!feof(studfile)) {
+		if (avg > 4.0) {
+			printf("ФН: %d \n със среден успех: %f \n", stud1.fn, avg);
+		}
+		fclose(studfile);
+}
+void main()
+{
+	system("chcp 1251");
+	printf("Име на файла: ");
+	gets_s(filename);
+	int c;
+	do
+	{
+		printf("\nMenu:\n");
+		printf("0 - Изход\n");
+		printf("1 - Създаване на файл\n");
+		printf("2 - Добави данни за студент\n");
+		printf("3 - Изтрий данни за студент според ФН\n");
+		printf("4 - Изведи данни за всички студенти\n");
+		printf("5 - Изведи факултетни номера с успех над 4\n");
+		scanf("%d", &c);
+		switch (c)
+		{
+		case 1: createFile(); break;
+		case 2: addStudent(); break;
+		case 3: deleteData(); break;
+		case 4: writeAllStud(); break;
+		case 5: writeAvgStud(); break;
+		}
+	} while (c != 0);
+}
