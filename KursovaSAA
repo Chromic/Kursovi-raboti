@@ -1,0 +1,116 @@
+#include <iostream>
+#include<string>
+using namespace std;
+
+struct Item {
+	string naprav;
+	string chasizl;
+	string chaskac;
+	int termizl;
+	int termkac;
+	char fime[5];
+	int mqsto;
+	Item *NextByPlace;
+};
+
+typedef Item* Point;
+Point HeadByPlace, HeadFirstCl, HeadNoSm, HeadSm;
+
+void ConnectLists(Point &P, Point A) {
+	if (P == NULL) {
+		P = A;
+	}
+	else {
+		while (P) {
+			P = P->NextByPlace;
+			if (P->NextByPlace == NULL)
+				P->NextByPlace = A;
+		}
+	}
+}
+
+void PrintOut(Point P) {
+	while (P) {
+		cout << P->mqsto << endl;
+		cout << P->naprav << endl;
+		cout << P->chasizl << endl;
+		cout << P->chaskac << endl;
+		cout << P->termizl << endl;
+		cout << P->termkac << endl;
+		cout << P->fime << endl;
+		P = P->NextByPlace;
+	}
+}
+
+void Create(Point &Head, int i)
+{
+	Point Last, P;
+	Last = NULL;
+	P = new Item;
+	P->mqsto = i;
+	cout << "Enter destination" << endl;
+	cin >> P->naprav;
+	cout << "Enter departure HOUR" << endl;
+	cin >> P->chasizl;
+	cout << "Enter arrival HOUR" << endl;
+	cin >> P->chaskac;
+	cout << "Enter # of leaving terminal" << endl;
+	cin >> P->termizl;
+	cout << "Enter # of entering terminal" << endl;
+	cin >> P->termkac;
+	cout << "Last name of traveler" << endl;
+	cin >> P->fime;
+	P->NextByPlace = NULL;
+	if (Head == NULL)
+	{
+		Head = P;
+	}
+	else {
+		Last->NextByPlace = P;
+	}
+	Last = P;
+}
+
+void Delete(char name[], Point &Head) {
+	Point Pprev, P;
+	P = new Item;
+	Pprev = new Item;
+	cin >> name;
+	while (Head) {
+		if (strcmp(Head->fime, name)==1) {
+			Pprev = P->NextByPlace;
+			*P = *Pprev;
+			delete Pprev;
+		}
+	}
+}
+
+void main() {
+char ch;
+HeadByPlace = NULL;
+HeadFirstCl = NULL;
+HeadNoSm = NULL;
+HeadSm = NULL;
+int i;
+cout << "New element? (Y/N)? : ";
+cin >> ch;
+while (ch == 'Y' || ch == 'y')
+{
+	cout << "Enter seat #: ";
+	cin >> i;
+	if (i < 7) Create(HeadFirstCl,i);
+	else if (i > 7 && i < 25) Create(HeadNoSm,i);
+	else if (i > 25) Create(HeadSm,i);
+	cout << " New element? (Y/N) ?: ";
+	cin >> ch;
+		
+}
+
+ConnectLists(HeadByPlace, HeadFirstCl);
+ConnectLists(HeadByPlace, HeadNoSm);
+ConnectLists(HeadByPlace, HeadSm);
+
+PrintOut(HeadByPlace);
+
+system("pause");
+}
