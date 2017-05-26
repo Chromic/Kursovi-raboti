@@ -16,18 +16,6 @@ struct Item {
 typedef Item* Point;
 Point HeadByPlace, HeadFirstCl, HeadNoSm, HeadSm;
 
-void ConnectLists(Point &P, Point A) {
-	if (P == NULL) {
-		P = A;
-	}
-	else {
-		while (P) {
-			P = P->NextByPlace;
-			if (P->NextByPlace == NULL)
-				P->NextByPlace = A;
-		}
-	}
-}
 
 void PrintOut(Point P) {
 	while (P) {
@@ -42,11 +30,33 @@ void PrintOut(Point P) {
 	}
 }
 
-void Create(Point &Head, int i)
+void Traverse(Point P) {
+	while (P){
+		if (P->mqsto == P->NextByPlace->mqsto) {
+		}
+		P = P->NextByPlace;
+	}
+}
+
+void MergeLists(Item** List1, Item* List2)
 {
+	Item* ListPtr = *List1;
+	if (ListPtr == NULL) {
+		*List1 = List2;	
+	}
+	else {
+		while (ListPtr->NextByPlace) {
+			ListPtr = ListPtr->NextByPlace;
+		}
+		ListPtr->NextByPlace = List2;
+	}
+}
+
+void Create(Point &Head, int i){
 	Point Last, P;
 	Last = NULL;
 	P = new Item;
+
 	P->mqsto = i;
 	cout << "Enter destination" << endl;
 	cin >> P->naprav;
@@ -106,9 +116,15 @@ while (ch == 'Y' || ch == 'y')
 		
 }
 
-ConnectLists(HeadByPlace, HeadFirstCl);
-ConnectLists(HeadByPlace, HeadNoSm);
-ConnectLists(HeadByPlace, HeadSm);
+MergeLists(&HeadByPlace, HeadFirstCl);
+MergeLists(&HeadByPlace, HeadNoSm);;
+MergeLists(&HeadByPlace, HeadSm);
+
+PrintOut(HeadFirstCl);
+
+PrintOut(HeadNoSm);
+
+PrintOut(HeadSm);
 
 PrintOut(HeadByPlace);
 
