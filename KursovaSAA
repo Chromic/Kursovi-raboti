@@ -113,7 +113,6 @@ while (ch == 'Y' || ch == 'y')
 	else if (i > 25) Create(HeadSm,i);
 	cout << " New element? (Y/N) ?: ";
 	cin >> ch;
-		
 }
 
 MergeLists(&HeadByPlace, HeadFirstCl);
