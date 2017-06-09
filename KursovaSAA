@@ -1,5 +1,6 @@
 #include <iostream>
-#include<string>
+#include <string>
+
 using namespace std;
 
 struct Item {
@@ -8,14 +9,13 @@ struct Item {
 	string chaskac;
 	int termizl;
 	int termkac;
-	char fime[5];
+	char fime[50];
 	int mqsto;
 	Item *NextByPlace;
 };
 
 typedef Item* Point;
 Point HeadByPlace, HeadFirstCl, HeadNoSm, HeadSm;
-
 
 void PrintOut(Point P) {
 	while (P) {
@@ -31,7 +31,7 @@ void PrintOut(Point P) {
 }
 
 void Traverse(Point P) {
-	while (P){
+	while (P) {
 		if (P->mqsto == P->NextByPlace->mqsto) {
 		}
 		P = P->NextByPlace;
@@ -42,7 +42,7 @@ void MergeLists(Item** List1, Item* List2)
 {
 	Item* ListPtr = *List1;
 	if (ListPtr == NULL) {
-		*List1 = List2;	
+		*List1 = List2;
 	}
 	else {
 		while (ListPtr->NextByPlace) {
@@ -52,9 +52,8 @@ void MergeLists(Item** List1, Item* List2)
 	}
 }
 
-void Create(Point &Head, int i){
-	Point Last, P;
-	Last = NULL;
+void Create(Point &Head, int i) {
+	Point P;
 	P = new Item;
 
 	P->mqsto = i;
@@ -70,62 +69,77 @@ void Create(Point &Head, int i){
 	cin >> P->termkac;
 	cout << "Last name of traveler" << endl;
 	cin >> P->fime;
-	P->NextByPlace = NULL;
-	if (Head == NULL)
-	{
-		Head = P;
-	}
-	else {
-		Last->NextByPlace = P;
-	}
-	Last = P;
+
+	P->NextByPlace = Head;
+	Head = P;
 }
 
 void Delete(char name[], Point &Head) {
-	Point Pprev, P;
-	P = new Item;
-	Pprev = new Item;
-	cin >> name;
-	while (Head) {
-		if (strcmp(Head->fime, name)==1) {
-			Pprev = P->NextByPlace;
-			*P = *Pprev;
-			delete Pprev;
+	Point P = Head;
+	Point temp;
+
+	if (P != NULL) {
+		if (strcmp(P->fime, name) == 0) {
+			Head = P->NextByPlace;
+			delete P;
+			return;
 		}
+	}
+	else {
+		return;
+	}
+	while (P != NULL) {
+		temp = P->NextByPlace;
+		if (temp != NULL) {
+			if (strcmp(temp->fime, name) == 0) {
+				P->NextByPlace = temp->NextByPlace;
+				delete temp;
+				return;
+			}
+		}
+		P = P->NextByPlace;
 	}
 }
 
 void main() {
-char ch;
-HeadByPlace = NULL;
-HeadFirstCl = NULL;
-HeadNoSm = NULL;
-HeadSm = NULL;
-int i;
-cout << "New element? (Y/N)? : ";
-cin >> ch;
-while (ch == 'Y' || ch == 'y')
-{
-	cout << "Enter seat #: ";
-	cin >> i;
-	if (i < 7) Create(HeadFirstCl,i);
-	else if (i > 7 && i < 25) Create(HeadNoSm,i);
-	else if (i > 25) Create(HeadSm,i);
-	cout << " New element? (Y/N) ?: ";
+	char ch, dfime[50],dfime2[50];
+	HeadByPlace = NULL;
+	HeadFirstCl = NULL;
+	HeadNoSm = NULL;
+	HeadSm = NULL;
+	int i;
+	cout << "New element? (Y/N)? : ";
 	cin >> ch;
-}
+	while (ch == 'Y' || ch == 'y')
+	{
+		cout << "Enter seat #: ";
+		cin >> i;
+		if (i < 7) Create(HeadFirstCl, i);
+		else if (i > 7 && i < 25) Create(HeadNoSm, i);
+		else if (i > 25) Create(HeadSm, i);
+		cout << " New element? (Y/N) ?: ";
+		cin >> ch;
 
-MergeLists(&HeadByPlace, HeadFirstCl);
-MergeLists(&HeadByPlace, HeadNoSm);;
-MergeLists(&HeadByPlace, HeadSm);
+	}
 
-PrintOut(HeadFirstCl);
+	MergeLists(&HeadByPlace, HeadFirstCl);
+	MergeLists(&HeadByPlace, HeadNoSm);;
+	MergeLists(&HeadByPlace, HeadSm);
+	//PrintOut(HeadFirstCl);
+	//PrintOut(HeadNoSm);
+	//PrintOut(HeadSm);
+	PrintOut(HeadByPlace);
 
-PrintOut(HeadNoSm);
+	cout << "Which passengers ticket do you want removed? (Enter last name)";
+	cin >> dfime;
+	Delete(dfime, HeadByPlace);
+	PrintOut(HeadFirstCl);
 
-PrintOut(HeadSm);
-
-PrintOut(HeadByPlace);
-
-system("pause");
+	cout << "First class passengers"<<endl;
+	PrintOut(HeadFirstCl);
+	cout << "Busines class for non smokers passangers" << endl;
+	PrintOut(HeadNoSm);
+	cout << "Business class for smokers passengers"<<endl;
+	PrintOut(HeadSm);
+	system("pause");
 }
